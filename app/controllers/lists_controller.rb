@@ -28,11 +28,16 @@ class ListsController < ApplicationController
     redirect_to lists_path, status: :see_other
   end
 
-  def add_movies
+  def add_movie_to_list
     @list = List.find(params[:id])
-    @movies = Movie.all # Adjust based on your actual logic to fetch movies
-  end
+    @movie_list = @list.bookmarks.build(movie_id: movie_list_params[:movie_id])
 
+    if @movie_list.save
+      redirect_to @list, notice: 'Movie added to the list successfully.'
+    else
+      render 'lists/show'
+    end
+  end
   def create_movies
     @list = List.find(params[:id])
     selected_movie_ids = params[:movie_ids] || []
@@ -51,5 +56,9 @@ class ListsController < ApplicationController
 
   def list_params
     params.require(:list).permit(:name, :other_attributes)
+  end
+
+  def movie_list_params
+    params.permit(:movie_id)
   end
 end
